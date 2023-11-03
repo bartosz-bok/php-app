@@ -1,2 +1,4 @@
 *.xml
 *.iml
+/backup
+/mysql-data

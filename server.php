@@ -15,14 +15,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
+    // Haszowanie hasła przed zapytaniem
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+    $sql = "SELECT * FROM users WHERE username='$username'";
     $result = $conn->query($sql);
 
     if ($result->num_rows == 1) {
-        session_start();
-        $_SESSION['loggedin'] = true;
-        $_SESSION['username'] = $username;
-        echo "Zalogowano";
+        $row = $result->fetch_assoc();
+        // Sprawdzenie hasza hasła z bazy danych
+        if (password_verify($password, $row['password'])) {
+            session_start();
+            $_SESSION['loggedin'] = true;
+            $_SESSION['username'] = $username;
+            echo "Zalogowano";
+        } else {
+            echo "Błąd logowania";
+        }
     } else {
         echo "Błąd logowania";
     }
@@ -33,13 +42,15 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && iss
     $username = $_POST['username'];
     $new_password = $_POST['new_password'];
 
-    // Aktualizacja hasła w bazie danych dla użytkownika 'admin'
-    $sql = "UPDATE users SET password = ? WHERE username = 'admin'";
+    // Haszowanie nowego hasła
+    $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
+
+    $sql = "UPDATE users SET password = ? WHERE username = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $new_password); // "s" oznacza typ zmiennej (string)
+    $stmt->bind_param("ss", $hashed_new_password, $username);
 
     if ($stmt->execute()) {
-        echo "Hasło dla użytkownika 'admin' zostało zaktualizowane.";
+        echo "Hasło dla użytkownika '$username' zostało zaktualizowane.";
     } else {
         echo "Błąd podczas aktualizacji hasła: " . $stmt->error;
     }

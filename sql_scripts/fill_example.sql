@@ -14,4 +14,4 @@ INSERT INTO events (event_name, start_date, end_date, description, image_url, ca
 
 -- Wstawianie danych do tabeli users
 INSERT INTO users (username, password) VALUES
-                                           ('admin', 'pass');
+                                           ('admin', '$2a$12$NLi5OkQ0Eo.DB.zB6q.Ok.cYDMQtyuBn9LiwvRO9upl6e0N9TnVxu');
