@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ZAIUZ PROJECT</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Dodatkowy styl dla obszaru logowania */
+        #login-section {
+            float: right;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Wojny i konflikty XX wieku</h1>
+
+<!-- Obszar logowania -->
+<div id="login-section">
+    <h2>ZALOGUJ</h2>
+    <form id="login-form">
+        <label for="username">Nazwa użytkownika:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">Hasło:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <input type="submit" value="Zaloguj">
+    </form>
+    <p id="login-message"></p>
+    <button id="logout-button" style="display: none;">WYLOGUJ</button>
+    <button id="change-pass-button" style="display: none;">ZMIEŃ HASŁO</button>
+</div>
+
+<!-- Status zalogowania -->
+<p id="status"></p>
+
+<!-- Wyświetlanie danych z wydarzeń -->
+<div id="events-list"></div>
+<script>
+    const loginForm = document.getElementById('login-form');
+    const loginMessage = document.getElementById('login-message');
+    const status = document.getElementById('status');
+    const eventsList = document.getElementById('events-list');
+    const changePassButton = document.getElementById('change-pass-button');
+    const changePassURL = 'change_password_page.html'; // zmienna, która przechowuje adres nowej strony
+
+    loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const event_type = "login";
+
+        fetch('server.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `username=${username}&password=${password}&event_type=${event_type}`
+        })
+            .then(response => response.text())
+            .then(data => {
+                if (data === "Zalogowano") {
+                    loginMessage.innerHTML = `Jesteś zalogowany jako ${username}`;
+                    checkLoginStatus();
+                    document.getElementById('logout-button').style.display = 'block'; // Pokaż przycisk "Wyloguj" po zalogowaniu
+                    document.getElementById('change-pass-button').style.display = 'block'; // Pokaż dodatkowy przycisk po zalogowaniu
+                } else {
+                    loginMessage.innerHTML = "Błąd logowania";
+                    document.getElementById('logout-button').style.display = 'none'; // Ukryj przycisk "Wyloguj" w przypadku błędnego logowania
+                    document.getElementById('change-pass-button').style.display = 'none'; // Ukryj dodatkowy przycisk w przypadku błędnego logowania
+                }
+            })
+            .catch(error => console.error('Błąd logowania:', error));
+    });
+
+    function checkLoginStatus() {
+        fetch('server.php')
+            .then(response => response.json())
+            .then(data => {
+                displayEvents(data);
+            })
+            .catch(error => console.error('Błąd pobierania danych:', error));
+    }
+
+    function displayEvents(data) {
+        eventsList.innerHTML = ''; // Wyczyszczenie listy przed wyświetleniem nowych danych
+
+        if (data.length > 0) {
+            data.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.innerHTML = `
+                    <p>ID: ${event.id}</p>
+                    <p>Nazwa wydarzenia: ${event.event_name}</p>
+                    <p>Data rozpoczęcia: ${event.start_date}</p>
+                    <p>Data zakończenia: ${event.end_date}</p>
+                    <p>Opis: ${event.description}</p>
+                    <p>URL obrazka: ${event.image_url}</p>
+                    <p>ID kategorii: ${event.category_id}</p>
+                    <hr>
+                `;
+                eventsList.appendChild(eventDiv);
+            });
+        } else {
+            eventsList.innerHTML = "Brak danych w tabeli events.";
+        }
+    }
+
+    checkLoginStatus(); // Wywołanie funkcji do pobrania wydarzeń na starcie
+
+    // Obsługa przycisku wylogowania
+    const logoutButton = document.getElementById('logout-button');
+    logoutButton.addEventListener('click', function() {
+        document.getElementById('logout-button').style.display = 'none'; // Ukryj przycisk "Wyloguj" po wylogowaniu
+        document.getElementById('change-pass-button').style.display = 'none'; // Ukryj dodatkowy przycisk po wylogowaniu
+        loginMessage.innerHTML = ''; // Wyczyść komunikat o zalogowaniu
+        // Tutaj można dodać kod do wylogowania użytkownika z sesji (np. poprzez wywołanie odpowiedniego skryptu PHP)
+    });
+
+
+    changePassButton.addEventListener('click', function() {
+        window.location.href = changePassURL; // Przekierowanie użytkownika do nowej strony
+    });
+
+</script>
+</body>
+</html>
