@@ -11,51 +11,44 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($_POST['password'])
-    && isset($_POST['event_type'])){
+    && $_POST['event_type'] == 'login'){
     $username = $_POST['username'];
     $password = $_POST['password'];
-    $event_type = $_POST['event_type'];
 
-    if ($event_type === 'login') {
-        $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
-        $result = $conn->query($sql);
+    $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
+    $result = $conn->query($sql);
 
-        if ($result->num_rows == 1) {
-            session_start();
-            $_SESSION['loggedin'] = true;
-            $_SESSION['username'] = $username;
-            echo "Zalogowano";
-        } else {
-            echo "Błąd logowania";
-        }
+    if ($result->num_rows == 1) {
+        session_start();
+        $_SESSION['loggedin'] = true;
+        $_SESSION['username'] = $username;
+        echo "Zalogowano";
+    } else {
+        echo "Błąd logowania";
     }
 }
 
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($_POST['new_password']) &&
-    isset($_POST['event_type'])){
+    $_POST['event_type'] === 'change_password'){
     $username = $_POST['username'];
     $new_password = $_POST['new_password'];
-    $event_type = $_POST['event_type'];
 
-    if ($event_type === "change_password") {
-        // Aktualizacja hasła w bazie danych dla użytkownika 'admin'
-        $sql = "UPDATE users SET password = ? WHERE username = 'admin'";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $new_password); // "s" oznacza typ zmiennej (string)
+    // Aktualizacja hasła w bazie danych dla użytkownika 'admin'
+    $sql = "UPDATE users SET password = ? WHERE username = 'admin'";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $new_password); // "s" oznacza typ zmiennej (string)
 
-        if ($stmt->execute()) {
-            echo "Hasło dla użytkownika 'admin' zostało zaktualizowane.";
-        } else {
-            echo "Błąd podczas aktualizacji hasła: " . $stmt->error;
-        }
-
-        $stmt->close();
+    if ($stmt->execute()) {
+        echo "Hasło dla użytkownika 'admin' zostało zaktualizowane.";
+    } else {
+        echo "Błąd podczas aktualizacji hasła: " . $stmt->error;
     }
 
+    $stmt->close();
 }
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && isset($_POST['start_date']) &&
     isset($_POST['end_date']) && isset($_POST['description']) && isset($_POST['image_url']) &&
-    isset($_POST['category_id']) ){
+    isset($_POST['category_id']) && $_POST['event_type'] === 'add_event'){
 
     $event_name = $_POST['event_name'];
     $start_date = $_POST['start_date'];
@@ -63,9 +56,6 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && i
     $description = $_POST['description'];
     $image_url = $_POST['image_url'];
     $category_id = $_POST['category_id'];
-
-    // Połączenie z bazą danych - wymaga ustalenia wcześniej połączenia z bazą danych
-    // $db to zmienna reprezentująca połączenie z bazą danych
 
     // Zapytanie SQL do wstawienia danych do tabeli events
     $sql = "INSERT INTO events (event_name, start_date, end_date, description, image_url, category_id) 
@@ -78,8 +68,7 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && i
     }
 
 }
-
-else {
+elseif ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['event_name'] === 'display_events'){
     $sql = "SELECT * FROM events";
     $result = $conn->query($sql);
 

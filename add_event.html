@@ -43,6 +43,8 @@
         event.preventDefault(); // Zapobieganie domyślnemu zachowaniu formularza
 
         const formData = new FormData(eventForm);
+        formData.append('event_type', 'add_event'); // Dodanie dodatkowego pola do danych formularza
+
         fetch('server.php', {
             method: 'POST',
             body: formData
@@ -50,8 +52,6 @@
             .then(response => response.text())
             .then(result => {
                 alert(result); // Wyświetlenie odpowiedzi z serwera
-                // Opcjonalnie można dodać przekierowanie do innej strony po dodaniu wydarzenia
-                // window.location.href = 'inne_strona.html';
             })
             .catch(error => {
                 console.error('Wystąpił błąd:', error);
