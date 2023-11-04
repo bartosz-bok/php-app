@@ -57,7 +57,6 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && iss
     } else {
         echo "Błąd podczas aktualizacji hasła: " . $stmt->error;
     }
-
     $stmt->close();
 }
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && isset($_POST['start_date']) &&
@@ -89,7 +88,6 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && i
     } else {
         echo "Błąd przygotowania zapytania.";
     }
-
 }
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['event_name'] === 'display_events'){
     $sql = "SELECT * FROM events";
@@ -103,10 +101,7 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['event_name'] === 'displa
             $events[] = $row;
         }
     }
-
     echo json_encode($events);
-
 }
-
 $conn->close();
 ?>
