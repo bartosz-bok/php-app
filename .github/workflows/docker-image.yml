@@ -22,6 +22,7 @@ jobs:
           ./sh_scripts/build_containers.sh
           docker-compose up -d
           exit_status=$?  # Pobranie statusu wyjścia
+        
           if [ $exit_status -eq 0 ]; then
             echo "Docker Compose ran successfully"
           else
