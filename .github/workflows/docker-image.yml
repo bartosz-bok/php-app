@@ -18,7 +18,7 @@ jobs:
     - name: Build the Docker image
       run: |
           cd backend
-          ./sh_scripts/clean_containers.sh
+          ./sh_scripts/clean_containers.sh --remove-app --remove-mysql
           ./sh_scripts/build_containers.sh
           docker-compose up -d
           exit_status=$?  # Pobranie statusu wyjścia
