@@ -20,3 +20,11 @@ jobs:
           cd backend
           ./sh_scripts/clean_containers.sh
           ./sh_scripts/build_containers.sh
+          docker-compose up -d
+          exit_status=$?  # Pobranie statusu wyjścia
+          if [ $exit_status -eq 0 ]; then
+            echo "Docker Compose ran successfully"
+          else
+            echo "Error running Docker Compose"
+            exit 1  # Wymuszenie błędu w przypadku niepowodzenia polecenia
+          fi
