@@ -18,5 +18,5 @@ echo "Zainicjowano tabele oraz wgrano dane początkowe."
 echo "Stawiam serwer..."
 
 # Uruchomienie serwera PHP
-php -S 192.168.9.151:20951
+php -S 0.0.0.0:8000
 
