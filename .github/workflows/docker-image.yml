@@ -8,24 +8,26 @@ on:
   workflow_dispatch:
 
 jobs:
-
   build:
-
     runs-on: self-hosted
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: |
+      - uses: actions/checkout@v3
+      - name: Stop and remove running containers
+        run: |
           cd backend
           ./sh_scripts/clean_containers.sh --remove-app --remove-mysql
+        continue-on-error: true  # Kontynuuj nawet jeśli wystąpi błąd
+
+      - name: Build and run the Docker image
+        run: |
+          cd backend
           ./sh_scripts/build_containers.sh
           docker compose up -d
-          exit_status=$?  # Pobranie statusu wyjścia
-        
+          exit_status=$?
+
           if [ $exit_status -eq 0 ]; then
             echo "Docker Compose ran successfully"
           else
             echo "Error running Docker Compose"
-            exit 1  # Wymuszenie błędu w przypadku niepowodzenia polecenia
+            exit 1
           fi
