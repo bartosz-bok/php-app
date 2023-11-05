@@ -11,6 +11,8 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
+      - name: Changing chmod of used directory
+        run: sudo chmod -R 777 /home/ubuntu/actions-runner/
       - uses: actions/checkout@v3
       - name: Stop and remove running containers
         run: |
