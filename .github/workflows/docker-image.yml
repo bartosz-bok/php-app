@@ -24,7 +24,6 @@ jobs:
         run: |
           cd backend
           ./sh_scripts/build_containers.sh
-          docker compose up -d
           exit_status=$?
 
           if [ $exit_status -eq 0 ]; then
