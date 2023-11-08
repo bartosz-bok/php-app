@@ -12,18 +12,18 @@ if [[ "$1" == "--remove-app" && "$2" == "--remove-mysql" ]]; then
     sudo rm -r mysql-data
     sudo service mysql stop
 
-    echo "Usunięto oba obrazy: aplikacji i MySQL."
+    echo "Both application and MySQL images have been removed."
 elif [ "$1" == "--remove-app" ]; then
     docker rmi backend-app:latest
 
-    echo "Usunięto obraz aplikacji."
+    echo "Application image removed."
 elif [ "$1" == "--remove-mysql" ]; then
     docker rmi mysql
 
     sudo rm -r mysql-data
     sudo service mysql stop
 
-    echo "Usunięto obraz MySQL."
+    echo "MySQL image removed."
 else
-    echo "Nie usunięto obrazów aplikacji oraz bazy MySQL."
+    echo "Application images and MySQL database were not deleted."
 fi
