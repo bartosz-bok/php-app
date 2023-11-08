@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
     '/api': {
-      target: 'http://127.0.0.1:8000/server.php',
+      target: 'http://147.135.211.80:8000/server.php',
       changeOrigin: true,
       secure: false,
       rewrite: (path) => path.replace(/^\/api/, '')

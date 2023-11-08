@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "apexcharts": "^3.44.0",
-    "react-apexcharts": "^1.4.1",
-    "react-timelines": "^2.6.1"
-  }
-}
