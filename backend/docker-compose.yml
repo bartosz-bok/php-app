@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  app:
+  app-backend:
     build: .
-    container_name: my-php-app
+    container_name: app-php-backend
     ports:
       - "8000:8000"
     depends_on:
@@ -13,7 +13,7 @@ services:
 
   mysql:
     image: mysql
-    container_name: my-mysql-container
+    container_name: mysql-container
     environment:
       MYSQL_DATABASE: 'db'
       MYSQL_USER: 'user'
