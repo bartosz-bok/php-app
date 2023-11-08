@@ -1,5 +1,6 @@
 *.xml
 *.iml
+*.meta
 backend/backup/
 backend/mysql-data/
 

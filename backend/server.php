@@ -1,5 +1,5 @@
 <?php
-$servername = "127.0.0.1";
+$servername = "mysql";
 $username = "user";
 $password = "password";
 $dbname = "db";
@@ -18,8 +18,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($
     // Haszowanie hasła przed zapytaniem
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    $sql = "SELECT * FROM users WHERE username='$username'";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM users WHERE username=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows == 1) {
         $row = $result->fetch_assoc();
@@ -54,34 +57,43 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && iss
     } else {
         echo "Błąd podczas aktualizacji hasła: " . $stmt->error;
     }
-
     $stmt->close();
 }
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && isset($_POST['start_date']) &&
     isset($_POST['end_date']) && isset($_POST['description']) && isset($_POST['image_url']) &&
     isset($_POST['category_id']) && $_POST['event_type'] === 'add_event'){
 
+    // Dane z formularza
     $event_name = $_POST['event_name'];
     $start_date = $_POST['start_date'];
     $end_date = $_POST['end_date'];
     $description = $_POST['description'];
     $image_url = $_POST['image_url'];
-    $category_id = $_POST['category_id'];
+    $category_id = intval($_POST['category_id']); // zmiana na liczbę całkowitą
 
     // Zapytanie SQL do wstawienia danych do tabeli events
     $sql = "INSERT INTO events (event_name, start_date, end_date, description, image_url, category_id) 
-            VALUES ('$event_name', '$start_date', '$end_date', '$description', '$image_url', $category_id)";
+        VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
 
-    if ($conn->query($sql) === TRUE) {
-        echo "Nowe wydarzenie zostało dodane pomyślnie.";
+    if ($stmt) {
+        $stmt->bind_param("sssssi", $event_name, $start_date, $end_date, $description, $image_url, $category_id);
+        $stmt->execute();
+
+        if ($stmt->affected_rows > 0) {
+            echo "Nowe wydarzenie zostało dodane pomyślnie.";
+        } else {
+            echo "Błąd podczas dodawania wydarzenia: " . $conn->error;
+        }
     } else {
-        echo "Błąd podczas dodawania wydarzenia: " . $conn->error;
+        echo "Błąd przygotowania zapytania.";
     }
-
 }
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['event_name'] === 'display_events'){
     $sql = "SELECT * FROM events";
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     $events = array();
     if ($result->num_rows > 0) {
@@ -89,9 +101,7 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['event_name'] === 'displa
             $events[] = $row;
         }
     }
-
     echo json_encode($events);
 }
-
 $conn->close();
 ?>

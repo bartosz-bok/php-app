@@ -1,7 +1,17 @@
 version: '3.8'
 
 services:
-  mysql-database:
+  app:
+    build: .
+    container_name: my-php-app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+    stdin_open: true
+    tty: true
+
+  mysql:
     image: mysql
     container_name: my-mysql-container
     environment:
