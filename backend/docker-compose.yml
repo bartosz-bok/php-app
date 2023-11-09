@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app-backend:
     build: .
-    container_name: app-php-backend
+    container_name: app-backend-container
     ports:
       - "8000:8000"
     depends_on:

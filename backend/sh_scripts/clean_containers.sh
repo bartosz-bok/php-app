@@ -2,12 +2,13 @@
 
 docker compose kill
 docker compose stop
-docker compose down
+docker compose down --remove-orphans
 echo ""
 
 if [[ "$1" == "--remove-app" && "$2" == "--remove-mysql" ]]; then
     docker rmi mysql
-    docker rmi backend-app:latest
+    docker rmi app-backend-container:latest
+    docker rmi app-frontend-container:latest
 
     sudo rm -r mysql-data
     sudo service mysql stop
@@ -15,6 +16,7 @@ if [[ "$1" == "--remove-app" && "$2" == "--remove-mysql" ]]; then
     echo "Both application and MySQL images have been removed."
 elif [ "$1" == "--remove-app" ]; then
     docker rmi backend-app:latest
+    docker rmi app-frontend-container:latest
 
     echo "Application image removed."
 elif [ "$1" == "--remove-mysql" ]; then
