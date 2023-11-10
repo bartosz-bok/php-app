@@ -1,23 +1,12 @@
-import { useEffect, useState } from 'react';
+import { Error } from '../components/Error';
 import { TimelineComponent } from '../components/Timeline';
-import { eventsMapper } from '../../utils/eventsMapper';
+import { useFetchEvents } from '../hooks/useFetchEvents';
 
 export const Timeline = () => {
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    let formData = new FormData();
-    formData.append('event_name', 'display_events');
-    fetch('/api', {
-      method: 'POST',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((data) => setData(eventsMapper(data)));
-  }, []);
-
-  return <TimelineComponent data={data} />;
+  const { events, hasError } = useFetchEvents();
+  return hasError ? (
+    <Error errorText="Service unavailable, please try again later" />
+  ) : (
+    <TimelineComponent data={events} />
+  );
 };
