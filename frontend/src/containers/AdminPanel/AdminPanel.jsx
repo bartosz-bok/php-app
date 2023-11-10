@@ -33,7 +33,7 @@ export const AdminPanel = () => {
         setError('Invalid username or password');
       }
     } catch (error) {
-      console.error('Error during login:', error);
+      console.error('Error during login: ', error);
       setError('Something went wrong. Please try again later.');
     }
   };
