@@ -34,6 +34,7 @@ export const AdminPanel = () => {
       }
     } catch (error) {
       console.error('Error during login:', error);
+      setError('Something went wrong. Please try again later.');
     }
   };
 

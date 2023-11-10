@@ -5,8 +5,8 @@ function App() {
   return (
     <>
       <div>
-        <Timeline />
-        {/* <AdminPanel /> */}
+        {/* <Timeline /> */}
+        <AdminPanel />
       </div>
     </>
   );
