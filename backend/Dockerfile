@@ -23,7 +23,7 @@ RUN php -r "if (hash_file('sha384', 'composer-setup.php') === 'e21205b207c3ff031
 RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 
-RUN php composer.phar require firebase/php-jwt
+RUN php composer.phar require rbdwllr/reallysimplejwt
 
 # Nadanie uprawnień do wykonania pliku entrypoint.sh
 RUN chmod +x /entrypoint.sh

@@ -1,8 +1,7 @@
 <?php
 
 require 'vendor/autoload.php'; // Dodanie biblioteki PHP-JWT
-
-use Firebase\JWT\JWT;
+use ReallySimpleJWT\Token;
 
 $servername = "mysql";
 $username = "user";
@@ -15,26 +14,6 @@ if ($conn->connect_error) {
     die("Błąd połączenia: " . $conn->connect_error);
 }
 
-function generateJWT($username) {
-    $key = "your_secret_key"; // Sekretny klucz do generowania JWT
-    $payload = array(
-        "username" => $username,
-        "exp" => time() + 3600 // Token wygasa po godzinie (możesz dostosować)
-    );
-    $jwt = JWT::encode($payload, $key, 'HS256');
-    return $jwt;
-}
-
-// Funkcja do weryfikacji JWT
-function verifyJWT($jwt) {
-    $key = "your_secret_key";
-    try {
-        $decoded = JWT::decode($jwt, $key);
-        return true;
-    } catch (Exception $e) {
-        return false;
-    }
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($_POST['password'])
     && $_POST['event_type'] == 'login'){
@@ -54,27 +33,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($
         $row = $result->fetch_assoc();
         // Sprawdzenie hasza hasła z bazy danych
         if (password_verify($password, $row['password'])) {
-            $jwt = generateJWT($username);
-            echo json_encode(array("status" => "success", "token" => $jwt));
+            session_start();
+            $_SESSION['loggedin'] = true;
+            $_SESSION['username'] = $username;
+            // Generate a token
+            $secret = 'sec!ReT423*&';
+            $expiration = time() + 3600;
+            $issuer = 'localhost';
+
+            $token = Token::create($username, $secret, $expiration, $issuer);
+            echo json_encode(["status" => "success", "access_token" => $token]);
+
         } else {
-            echo json_encode(array("status" => "error", "message" => "Błąd logowania"));
+            echo "Błąd logowania";
         }
     } else {
-        echo json_encode(array("status" => "error", "message" => "Błąd logowania"));
+        echo "Błąd logowania";
     }
 }
 
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($_POST['new_password']) &&
-    $_POST['event_type'] === 'change_password' && isset($_POST['token']) && verifyJWT($_POST['token'])){
-    $username = $_POST['username'];
-    $new_password = $_POST['new_password'];
+    $_POST['event_type'] === 'change_password' && isset($_POST['access_token'])){
 
-    // Haszowanie nowego hasła
-    $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
+    $token = $_POST['access_token'];
+    $secret = 'sec!ReT423*&';
 
-    $sql = "UPDATE users SET password = ? WHERE username = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $hashed_new_password, $username);
+    $token_result = Token::validate($token, $secret);
+
+    if ($token_result===true) {
+        $username = $_POST['username'];
+        $new_password = $_POST['new_password'];
+
+        // Haszowanie nowego hasła
+        $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
+
+        $sql = "UPDATE users SET password = ? WHERE username = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $hashed_new_password, $username);
+    }
 
     if ($stmt->execute()) {
         echo "Hasło dla użytkownika '$username' zostało zaktualizowane.";
@@ -85,32 +81,40 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && iss
 }
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && isset($_POST['start_date']) &&
     isset($_POST['end_date']) && isset($_POST['description']) && isset($_POST['image_url']) &&
-    isset($_POST['category_id']) && $_POST['event_type'] === 'add_event' && isset($_POST['token']) && verifyJWT($_POST['token'])){
+    isset($_POST['category_id']) && $_POST['event_type'] === 'add_event' && isset($_POST['access_token'])){
 
-    // Dane z formularza
-    $event_name = $_POST['event_name'];
-    $start_date = $_POST['start_date'];
-    $end_date = $_POST['end_date'];
-    $description = $_POST['description'];
-    $image_url = $_POST['image_url'];
-    $category_id = intval($_POST['category_id']); // zmiana na liczbę całkowitą
+    $token = $_POST['access_token'];
+    $secret = 'sec!ReT423*&';
 
-    // Zapytanie SQL do wstawienia danych do tabeli events
-    $sql = "INSERT INTO events (event_name, start_date, end_date, description, image_url, category_id) 
-        VALUES (?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
+    $token_result = Token::validate($token, $secret);
 
-    if ($stmt) {
-        $stmt->bind_param("sssssi", $event_name, $start_date, $end_date, $description, $image_url, $category_id);
-        $stmt->execute();
+    if ($token_result===true) {
 
-        if ($stmt->affected_rows > 0) {
-            echo "Nowe wydarzenie zostało dodane pomyślnie.";
+        // Dane z formularza
+        $event_name = $_POST['event_name'];
+        $start_date = $_POST['start_date'];
+        $end_date = $_POST['end_date'];
+        $description = $_POST['description'];
+        $image_url = $_POST['image_url'];
+        $category_id = intval($_POST['category_id']); // zmiana na liczbę całkowitą
+
+        // Zapytanie SQL do wstawienia danych do tabeli events
+        $sql = "INSERT INTO events (event_name, start_date, end_date, description, image_url, category_id) 
+            VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("sssssi", $event_name, $start_date, $end_date, $description, $image_url, $category_id);
+            $stmt->execute();
+
+            if ($stmt->affected_rows > 0) {
+                echo "Nowe wydarzenie zostało dodane pomyślnie.";
+            } else {
+                echo "Błąd podczas dodawania wydarzenia: " . $conn->error;
+            }
         } else {
-            echo "Błąd podczas dodawania wydarzenia: " . $conn->error;
+            echo "Błąd przygotowania zapytania.";
         }
-    } else {
-        echo "Błąd przygotowania zapytania.";
     }
 }
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['event_name'] === 'display_events'){

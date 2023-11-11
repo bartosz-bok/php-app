@@ -62,7 +62,7 @@
         })
             .then(response => response.text())
             .then(data => {
-                if (data === "Zalogowano") {
+                if (data.status === "success") {
                     loginMessage.innerHTML = `Jesteś zalogowany jako ${username}`;
                     checkLoginStatus();
                     // Pokaż przyciski
