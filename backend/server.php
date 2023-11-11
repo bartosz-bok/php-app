@@ -159,9 +159,7 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && i
         }
     }
 }
-elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && isset($_POST['start_date']) &&
-    isset($_POST['end_date']) && isset($_POST['description']) && isset($_POST['image_url']) &&
-    isset($_POST['category_id']) && isset($_POST['event_id']) && $_POST['event_type'] === 'delete_event'
+elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_id']) && $_POST['event_type'] === 'delete_event'
     && isset($_POST['access_token'])){
 
     $token = $_POST['access_token'];
