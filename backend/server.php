@@ -45,10 +45,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($
             echo json_encode(["status" => "success", "access_token" => $token]);
 
         } else {
-            echo "Błąd logowania";
+            echo json_encode(["status" => "bad username / bad password"]);
         }
     } else {
-        echo "Błąd logowania";
+        echo json_encode(["status" => "failed"]);
     }
 }
 
@@ -111,6 +111,80 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && i
                 echo "Nowe wydarzenie zostało dodane pomyślnie.";
             } else {
                 echo "Błąd podczas dodawania wydarzenia: " . $conn->error;
+            }
+        } else {
+            echo "Błąd przygotowania zapytania.";
+        }
+    }
+}
+elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && isset($_POST['start_date']) &&
+    isset($_POST['end_date']) && isset($_POST['description']) && isset($_POST['image_url']) &&
+    isset($_POST['category_id']) && isset($_POST['event_id']) && $_POST['event_type'] === 'change_event'
+    && isset($_POST['access_token'])){
+
+    $token = $_POST['access_token'];
+    $secret = 'sec!ReT423*&';
+
+    $token_result = Token::validate($token, $secret);
+
+    if ($token_result===true) {
+
+        // Dane z formularza
+        $event_name = $_POST['event_name'];
+        $start_date = $_POST['start_date'];
+        $end_date = $_POST['end_date'];
+        $description = $_POST['description'];
+        $image_url = $_POST['image_url'];
+        $category_id = intval($_POST['category_id']); // zmiana na liczbę całkowitą
+        $event_id = intval($_POST['event_id']); // zmiana na liczbę całkowitą
+
+        $sql = "UPDATE events 
+        SET event_name = ?, start_date = ?, end_date = ?, description = ?, image_url = ?, category_id = ?
+        WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+
+
+
+        if ($stmt) {
+            $stmt->bind_param("sssssii", $event_name, $start_date, $end_date, $description, $image_url, $category_id, $event_id);
+            $stmt->execute();
+
+            if ($stmt->affected_rows > 0) {
+                echo "Nowe wydarzenie zostało zmienione pomyślnie.";
+            } else {
+                echo "Błąd podczas edycji wydarzenia: " . $conn->error;
+            }
+        } else {
+            echo "Błąd przygotowania zapytania.";
+        }
+    }
+}
+elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && isset($_POST['start_date']) &&
+    isset($_POST['end_date']) && isset($_POST['description']) && isset($_POST['image_url']) &&
+    isset($_POST['category_id']) && isset($_POST['event_id']) && $_POST['event_type'] === 'delete_event'
+    && isset($_POST['access_token'])){
+
+    $token = $_POST['access_token'];
+    $secret = 'sec!ReT423*&';
+
+    $token_result = Token::validate($token, $secret);
+
+    if ($token_result === true) {
+
+        // ID wydarzenia do usunięcia
+        $event_id = intval($_POST['event_id']); // zmiana na liczbę całkowitą
+
+        $sql = "DELETE FROM events WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("i", $event_id);
+            $stmt->execute();
+
+            if ($stmt->affected_rows > 0) {
+                echo "Wydarzenie zostało usunięte pomyślnie.";
+            } else {
+                echo "Błąd podczas usuwania wydarzenia: " . $conn->error;
             }
         } else {
             echo "Błąd przygotowania zapytania.";
