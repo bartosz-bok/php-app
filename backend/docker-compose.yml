@@ -11,11 +11,11 @@ services:
     stdin_open: true
     tty: true
 
-  app-frontend: # Nowy kontener dla frontendu
-    build: ../frontend # Może to być ścieżka do katalogu, w którym znajduje się konfiguracja frontendu
+  app-frontend: # nowy kontener dla frontendu
+    build: ../frontend # ścieżka do katalogu, w którym znajduje się konfiguracja frontendu
     container_name: app-frontend-container
     ports:
-      - "5173:5173" # Zakładając, że frontend działa na porcie 5173
+      - "5173:5173"
     stdin_open: true
     tty: true
 
