@@ -1,4 +1,9 @@
 <?php
+
+require 'vendor/autoload.php'; // Dodanie biblioteki PHP-JWT
+
+use Firebase\JWT\JWT;
+
 $servername = "mysql";
 $username = "user";
 $password = "password";
@@ -8,6 +13,27 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
     die("Błąd połączenia: " . $conn->connect_error);
+}
+
+function generateJWT($username) {
+    $key = "your_secret_key"; // Sekretny klucz do generowania JWT
+    $payload = array(
+        "username" => $username,
+        "exp" => time() + 3600 // Token wygasa po godzinie (możesz dostosować)
+    );
+    $jwt = JWT::encode($payload, $key, 'HS256');
+    return $jwt;
+}
+
+// Funkcja do weryfikacji JWT
+function verifyJWT($jwt) {
+    $key = "your_secret_key";
+    try {
+        $decoded = JWT::decode($jwt, $key);
+        return true;
+    } catch (Exception $e) {
+        return false;
+    }
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($_POST['password'])
@@ -28,20 +54,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($
         $row = $result->fetch_assoc();
         // Sprawdzenie hasza hasła z bazy danych
         if (password_verify($password, $row['password'])) {
-            session_start();
-            $_SESSION['loggedin'] = true;
-            $_SESSION['username'] = $username;
-            echo "Zalogowano";
+            $jwt = generateJWT($username);
+            echo json_encode(array("status" => "success", "token" => $jwt));
         } else {
-            echo "Błąd logowania";
+            echo json_encode(array("status" => "error", "message" => "Błąd logowania"));
         }
     } else {
-        echo "Błąd logowania";
+        echo json_encode(array("status" => "error", "message" => "Błąd logowania"));
     }
 }
 
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($_POST['new_password']) &&
-    $_POST['event_type'] === 'change_password'){
+    $_POST['event_type'] === 'change_password' && isset($_POST['token']) && verifyJWT($_POST['token'])){
     $username = $_POST['username'];
     $new_password = $_POST['new_password'];
 
@@ -61,7 +85,7 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && iss
 }
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['event_name']) && isset($_POST['start_date']) &&
     isset($_POST['end_date']) && isset($_POST['description']) && isset($_POST['image_url']) &&
-    isset($_POST['category_id']) && $_POST['event_type'] === 'add_event'){
+    isset($_POST['category_id']) && $_POST['event_type'] === 'add_event' && isset($_POST['token']) && verifyJWT($_POST['token'])){
 
     // Dane z formularza
     $event_name = $_POST['event_name'];
