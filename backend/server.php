@@ -45,6 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && isset($
             echo json_encode(["status" => "success", "access_token" => $token]);
 
         } else {
+            header('HTTP/1.0 404 Not Found');
             echo json_encode(["status" => "bad username / bad password"]);
         }
     } else {
