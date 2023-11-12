@@ -31,9 +31,8 @@ export const eventsMapper = (events) =>
         text: event.description,
       },
       media: {
-        url: '//live.staticflickr.com/7340/11577202425_34b8e573cd_3k.jpg',
+        url: event.image_url,
         caption: 'Mozna dodac podpisy do zdjec tez.',
-        // credit: "flickr/<a href='http://www.flickr.com/photos/tm_10001/'>tm_10001</a>", // A to juz yebać
       },
       start_date: {
         month: startDate.getMonth() + 1,

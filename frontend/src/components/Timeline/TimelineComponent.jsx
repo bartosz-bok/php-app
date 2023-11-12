@@ -22,8 +22,6 @@ export const TimelineComponent = ({ data }) => {
       <div className={styles.timeline}>
         <div ref={timelineEl}></div>
       </div>
-      <p>Dane z backendu:</p>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
     </>
   );
 };

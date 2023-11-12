@@ -26,14 +26,13 @@ export const AdminPanel = () => {
 
       if (response.ok) {
         const data = await response.json();
-        const { jwt } = data;
+        const { access_token: jwt } = data;
         localStorage.setItem('jwtToken', jwt);
         setJwtToken(jwt);
       } else {
         setError('Invalid username or password');
       }
     } catch (error) {
-      console.error('Error during login: ', error);
       setError('Something went wrong. Please try again later.');
     }
   };
