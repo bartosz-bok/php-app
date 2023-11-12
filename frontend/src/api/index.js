@@ -1,4 +1,4 @@
-import { mapEventsToRaw, mapRawToEvents, mapRawToTimeline } from '../utils/eventsMappers';
+import { mapEventsToRaw, mapRawToEvents } from '../utils/eventsMappers';
 
 export const getEventsForTimeline = async () => {
   let formData = new FormData();
@@ -11,7 +11,7 @@ export const getEventsForTimeline = async () => {
     body: formData,
   })
     .then((res) => res.json())
-    .then((data) => mapRawToTimeline(data));
+    // .then((data) => mapRawToTimeline(data));
 };
 
 export const getEvents = async () => {
