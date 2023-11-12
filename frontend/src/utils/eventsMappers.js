@@ -55,7 +55,7 @@ export const mapRawToEvents = (events) =>
 
 export const mapEventsToRaw = (events) =>
   events.map((event) => ({
-    id: event.id,
+    event_id: event.id,
     event_name: event.eventName,
     start_date: event.startDate,
     end_date: event.endDate,
