@@ -1,11 +1,11 @@
 import { Error } from '../components/Error';
 import { TimelineComponent } from '../components/Timeline';
-import { getEvents } from '../api';
+import { getEventsForTimeline } from '../api';
 import { useFetch } from '../hooks/useFetch';
 import { GridLoader } from 'react-spinners';
 
 export const Timeline = () => {
-  const { data: events, hasError, isLoading } = useFetch(getEvents);
+  const { data: events, hasError, isLoading } = useFetch(getEventsForTimeline);
 
   if (isLoading) {
     return <GridLoader loading={isLoading} />;

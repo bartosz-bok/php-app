@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { LoginForm } from '../../components/LoginForm/LoginForm';
 import { PasswordResetForm } from '../../components/ChangePasswordForm/ChangePasswordForm';
 import styles from './styles.module.css';
 import { EventEditor } from '../EventEditor/EventEditor';
+import AddEventForm from '../../components/AddEventForm';
 
 export const AdminPanel = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isAddingEvent, setIsAddingEvent] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [jwtToken, setJwtToken] = useState(localStorage.getItem('jwtToken'));
@@ -26,9 +28,9 @@ export const AdminPanel = () => {
 
       if (response.ok) {
         const data = await response.json();
-        const { access_token: jwt } = data;
-        localStorage.setItem('jwtToken', jwt);
-        setJwtToken(jwt);
+        const { access_token: accessToken } = data;
+        localStorage.setItem('jwtToken', accessToken);
+        setJwtToken(accessToken);
       } else {
         setError('Invalid username or password');
       }
@@ -42,9 +44,21 @@ export const AdminPanel = () => {
     setJwtToken(null);
   };
 
-  const handleChangePassword = () => {
+  const handleChangePasswordClick = () => {
     setIsChangingPassword((prevState) => !prevState);
   };
+
+  const hideChangePasswordForm = useCallback(() => {
+    setIsChangingPassword(false);
+  }, []);
+
+  const handleAddEventClick = () => {
+    setIsAddingEvent((prevState) => !prevState);
+  };
+
+  const hideAddEventForm = useCallback(() => {
+    setIsAddingEvent(false);
+  }, []);
 
   if (!jwtToken) {
     return (
@@ -60,19 +74,27 @@ export const AdminPanel = () => {
   } else {
     return (
       <div className={styles.container}>
-      <div className={styles.innerContainer}>
-        <div className={styles.buttonContainer}>
-          <button className={styles.button} onClick={handleChangePassword}>
-            Change Password
-          </button>
-          <button className={`${styles.button} ${styles.logoutButton}`} onClick={handleLogout}>
-            Logout
-          </button>
+        <div className={styles.innerContainer}>
+          <div className={styles.buttonContainer}>
+            <div className={styles.leftButtons}>
+              <button className={styles.button} onClick={handleChangePasswordClick}>
+                Change Password
+              </button>
+              <button className={styles.button} onClick={handleAddEventClick}>
+                Add Event
+              </button>
+            </div>
+            <button className={`${styles.button} ${styles.logoutButton}`} onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+          {isChangingPassword && (
+            <PasswordResetForm hideChangePasswordForm={hideChangePasswordForm} />
+          )}
+          {isAddingEvent && <AddEventForm hideAddEventForm={hideAddEventForm} />}
+          <EventEditor />
         </div>
-        {isChangingPassword && <PasswordResetForm />}
-        <EventEditor />
       </div>
-    </div>
     );
   }
 };

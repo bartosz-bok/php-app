@@ -8,15 +8,13 @@ export const TimelineComponent = ({ data }) => {
   const timelineEl = useRef(null);
 
   useEffect(() => {
-    if(!data) return;
-    new Timeline(
-      timelineEl.current,
-      {
-        title: events.title,
-        events: data,
-      },
-    );
+    if (!data) return;
+    new Timeline(timelineEl.current, {
+      title: events.title,
+      events: data,
+    });
   }, [data]);
+
   return (
     <>
       <div className={styles.timeline}>

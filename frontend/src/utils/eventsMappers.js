@@ -21,7 +21,7 @@
 //   }
 // };
 
-export const eventsMapper = (events) =>
+export const mapRawToTimeline = (events) =>
   events.map((event) => {
     const startDate = new Date(event.start_date);
     const endDate = new Date(event.end_date);
@@ -46,3 +46,25 @@ export const eventsMapper = (events) =>
       },
     };
   });
+
+export const mapRawToEvents = (events) =>
+  events.map((event) => ({
+    id: event.id,
+    eventName: event.event_name,
+    startDate: event.start_date,
+    endDate: event.end_date,
+    description: event.description,
+    imageUrl: event.image_url,
+    categoryId: event.category_id,
+  }));
+
+export const mapEventsToRaw = (events) =>
+  events.map((event) => ({
+    id: event.id,
+    event_name: event.eventName,
+    start_date: event.startDate,
+    end_date: event.endDate,
+    description: event.description,
+    image_url: event.imageUrl,
+    category_id: event.categoryId,
+  }));

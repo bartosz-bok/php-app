@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import styles from './styles.module.css';
+import { changePassword } from '../../api';
 
-export const PasswordResetForm = () => {
+export const PasswordResetForm = ({ hideChangePasswordForm }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,12 +17,13 @@ export const PasswordResetForm = () => {
     }
 
     try {
-      await resetPassword(newPassword);
+      await changePassword(newPassword);
 
       setNewPassword('');
       setConfirmNewPassword('');
+      hideChangePasswordForm();
     } catch (error) {
-      setError('Error resetting password. Please try again.');
+      setError(error);
     }
   };
 
@@ -51,20 +53,4 @@ export const PasswordResetForm = () => {
       </button>
     </form>
   );
-};
-
-// tmp
-const resetPassword = (newPassword) => {
-  console.log(`Simulating password reset with new password: ${newPassword}`);
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const isError = Math.random() < 0.2;
-
-      if (isError) {
-        reject(new Error('Simulated error during password reset'));
-      } else {
-        resolve();
-      }
-    }, 1000);
-  });
 };

@@ -26,12 +26,18 @@
   cursor: pointer;
 }
 
-
 .buttonContainer {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
 }
 
 .logoutButton {
   background-color: #f44336;
+}
+
+.leftButtons {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
 }
