@@ -1,25 +1,19 @@
-// Do tego potrzebuje jakies zdjecia do katogorii
-
-// const getCategoryIcon = (continentId) => {
-//   switch (continentId) {
-//     case 1:
-//       return 'public/jakieś zdjęcie moze kontynentu'
-//     case 2:
-//       return 'public/jakieś zdjęcie moze kontynentu'
-//     case 3:
-//       return 'public/jakieś zdjęcie moze kontynentu'
-//     case 4:
-//       return 'public/jakieś zdjęcie moze kontynentu'
-//     case 5:
-//       return 'public/jakieś zdjęcie moze kontynentu'
-//     case 6:
-//       return 'public/jakieś zdjęcie moze kontynentu'
-//     case 7:
-//       return 'public/jakieś zdjęcie moze kontynentu'
-//     default:
-//       return undefined;
-//   }
-// };
+const getCategoryIcon = (continentId) => {
+  switch (continentId) {
+    case 1:
+      return 'continents/europe.png';
+    case 2:
+      return 'continents/northamerica.png';
+    case 3:
+      return 'continents/southamerica.png';
+    case 4:
+      return 'continents/africa.png';
+    case 5:
+      return 'continents/asia.png';
+    default:
+      return undefined;
+  }
+};
 
 export const mapRawToTimeline = (events) =>
   events.map((event) => {
@@ -33,6 +27,7 @@ export const mapRawToTimeline = (events) =>
       media: {
         url: event.image_url,
         caption: 'Mozna dodac podpisy do zdjec tez.',
+        thumbnail: getCategoryIcon(event.category_id),
       },
       start_date: {
         month: startDate.getMonth() + 1,
