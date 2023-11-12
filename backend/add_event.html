@@ -32,6 +32,12 @@
 <button id="button-go-back">POWRÓT</button>
 
 <script>
+    // Funkcja do odczytu ciasteczek
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
     const backButton = document.getElementById('button-go-back');
     const eventForm = document.getElementById('event-form');
 
@@ -43,7 +49,9 @@
         event.preventDefault(); // Zapobieganie domyślnemu zachowaniu formularza
 
         const formData = new FormData(eventForm);
+        const accessToken = getCookie('access_token');
         formData.append('event_type', 'add_event'); // Dodanie dodatkowego pola do danych formularza
+        formData.append('access_token', accessToken);
 
         fetch('server.php', {
             method: 'POST',

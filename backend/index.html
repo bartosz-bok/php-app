@@ -60,9 +60,9 @@
             },
             body: `username=${username}&password=${password}&event_type=${event_type}`
         })
-            .then(response => response.text())
+            .then(response => response.json())
             .then(data => {
-                if (data === "Zalogowano") {
+                if (data.status === "success") {
                     loginMessage.innerHTML = `Jesteś zalogowany jako ${username}`;
                     checkLoginStatus();
                     // Pokaż przyciski
@@ -75,6 +75,10 @@
                     document.getElementById('label:password').style.display = 'none';
                     document.getElementById('password').style.display = 'none';
                     document.getElementById('button:login').style.display = 'none';
+
+                    // Zapisz token do cookie
+                    document.cookie = `access_token=${data.access_token}; path=/`;
+
                 } else {
                     loginMessage.innerHTML = "Błąd logowania";
                     // Ukryj przyciski
