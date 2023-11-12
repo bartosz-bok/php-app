@@ -3,6 +3,8 @@ import { TimelineComponent } from '../components/Timeline';
 import { getEventsForTimeline } from '../api';
 import { useFetch } from '../hooks/useFetch';
 import { GridLoader } from 'react-spinners';
+import { mapRawToEvents, mapRawToTimeline } from '../utils/eventsMappers';
+import { DownloadPDFButton } from '../components/DownloadPdfButton/DownloadPdfButton';
 
 export const Timeline = () => {
   const { data: events, hasError, isLoading } = useFetch(getEventsForTimeline);
@@ -13,5 +15,10 @@ export const Timeline = () => {
   if (hasError) {
     return <Error errorText="Service unavailable, please try again later" />;
   }
-  return <TimelineComponent data={events} />;
+  return (
+    <>
+      <DownloadPDFButton data={mapRawToEvents(events)} />
+      <TimelineComponent data={mapRawToTimeline(events)} />;
+    </>
+  );
 };
