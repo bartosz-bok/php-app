@@ -26,7 +26,7 @@ export const mapRawToTimeline = (events) =>
       },
       media: {
         url: event.image_url,
-        caption: 'Mozna dodac podpisy do zdjec tez.',
+        // caption: 'Mozna dodac podpisy do zdjec tez.',
         thumbnail: getCategoryIcon(event.category_id),
       },
       start_date: {
